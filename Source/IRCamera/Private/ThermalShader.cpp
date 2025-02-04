@@ -65,42 +65,42 @@ TGlobalResource<FThermalVertexBuffer> GThermalVertexBuffer;
 
 
 
-class FPassThroughVS: public FMaterialShader
+class FPassThroughVS: public FGlobalShader
 {
     public: 
-        DECLARE_SHADER_TYPE(FPassThroughVS, Material);
+        DECLARE_GLOBAL_SHADER(FPassThroughVS);
 
     public: 
-        static bool ShouldCompilePermutation(const FMaterialShaderPermutationParameters& Parameters)
+        static bool ShouldCompilePermutation(const FGlobalShaderPermutationParameters& Parameters)
         {
             return true;
         }
 
         FPassThroughVS() {}
 
-        FPassThroughVS(const FMaterialShaderType::CompiledShaderInitializerType& Initializer): FMaterialShader(Initializer) {}
+        FPassThroughVS(const FGlobalShaderType::CompiledShaderInitializerType& Initializer): FGlobalShader(Initializer) {}
 };
 
 
-class FThermalPS : public FMaterialShader
+class FThermalPS : public FGlobalShader
 {
     public:
-        DECLARE_SHADER_TYPE(FThermalPS, Material);
-        SHADER_USE_PARAMETER_STRUCT(FThermalPS, FMaterialShader);
+        DECLARE_GLOBAL_SHADER(FThermalPS);
+        SHADER_USE_PARAMETER_STRUCT(FThermalPS, FGlobalShader);
         BEGIN_SHADER_PARAMETER_STRUCT(FParameters, )
             /* SHADER_PARAMETER_TEXTURE(Texture2D, BaseThermalTexture)
             SHADER_PARAMETER_SAMPLER(SamplerState, Sampler) */
         END_SHADER_PARAMETER_STRUCT()
 
     public: 
-        static bool ShouldCompilePermutation(const FMaterialShaderPermutationParameters& Parameters)
+        static bool ShouldCompilePermutation(const FGlobalShaderPermutationParameters& Parameters)
         {
             return IsFeatureLevelSupported(Parameters.Platform, ERHIFeatureLevel::SM5);
         }
 
-        static void ModifyCompilationEnvironment(const FMaterialShaderPermutationParameters& Parameters, FShaderCompilerEnvironment& OutEnvironment)
+        static void ModifyCompilationEnvironment(const FGlobalShaderPermutationParameters& Parameters, FShaderCompilerEnvironment& OutEnvironment)
         {
-            FMaterialShader::ModifyCompilationEnvironment(Parameters, OutEnvironment);
+            FGlobalShader::ModifyCompilationEnvironment(Parameters, OutEnvironment);
         }
 
         //void SetParameters(FRHICommandList& RHICmdList, const FShaderRHIParamRef ShaderRHI, const FParameters& Parameters);

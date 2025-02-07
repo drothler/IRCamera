@@ -3,7 +3,6 @@
 #include "ClearQuad.h"
 #include "RenderTargetPool.h"
 
-
 TRefCountPtr<IPooledRenderTarget> ThermalRenderTarget;
 FPooledRenderTargetDesc RenderTargetDesc;
 
@@ -110,64 +109,23 @@ bool FThermalViewExtension::UpdateCameraRenderTarget(FSceneView& InView) {
 }
 
 void FThermalViewExtension::PreRenderView_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneView& InView)
-{/* 
-    // Ensure we're on the render thread
-    check(IsInRenderingThread());
-    
-    if(!bIsRenderTargetInitialized){
-        bIsRenderTargetInitialized = SetupCameraRenderTexture(InView);
-    } 
-
-    if(!bIsRenderTargetInitialized) {
-        //UE_LOG(LogTemp, Error, TEXT("Could not initialized Render Target, aborting render."));
-        return;
-    }
-
-     if(!UpdateCameraRenderTarget(InView))
-    {
-        UE_LOG(LogTemp, Log, TEXT("No Thermal Camera active."));
-        return;
-    } 
-
-     UE_LOG(LogTemp, Log, TEXT("Updated Camera Render Target."));
-
-    FRHITexture* Texture = ThermalTexture.GetReference();
-    if (Texture)
-    {
-        FRHITransitionInfo TransitionInfo(Texture, ERHIAccess::Unknown, ERHIAccess::RTV);
-        RHICmdList.Transition(TransitionInfo);
-    } 
- 
-    FRHIRenderPassInfo RenderPassInfo(ThermalTexture, ERenderTargetActions::Load_Store);
-
-    //UE_LOG(LogTemp, Log, TEXT("Created RenderPassInfo"));
-
-    RHICmdList.BeginRenderPass(RenderPassInfo, TEXT("ThermalViewExtension"));
-    {
-        TestRenderTarget(RHICmdList);
-        //UE_LOG(LogTemp, Log, TEXT("Performed Frame Render."));
-    }
-    RHICmdList.EndRenderPass();  */ 
-}
-
-void FThermalViewExtension::PreRenderViewFamily_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneViewFamily& InViewFamily) 
 {
+    UE_LOG(LogTemp, Log, TEXT("Entering Pre Post Processing"));
+
+    FThermalRenderer ThermalRenderer;
+
+    FRHIRenderPassInfo RPInfo{FRHIRenderPassInfo::NoRenderTargets};
 
 
-    UE_LOG(LogTemp, Log, TEXT("Post Render"));
+    RHICmdList.BeginRenderPass(RPInfo, TEXT("ThermalRenderer"));
+
+    RHICmdList.SetViewport(0, 0, 0, 1920, 1080, 1);
+
+    SCOPED_DRAW_EVENTF(RHICmdList, ThermalRenderScene, TEXT("Thermal Render Scene"));
     
-        UE_LOG(LogTemp, Log, TEXT("Trying to Render Red"));
-        // Get the render target from the view family
-        FTexture2DRHIRef RenderTargetTexture = InViewFamily.RenderTarget->GetRenderTargetTexture();
+    ThermalRenderer.RenderThermalScene(InView, RHICmdList);
 
-        
-
-        for (int32 ViewIndex = 0; ViewIndex < InViewFamily.Views.Num(); ++ViewIndex)
-        {
-            TestRenderTarget(RHICmdList, RenderTargetTexture, InViewFamily.Views[ViewIndex]);
-        }
-        
-    
+    RHICmdList.EndRenderPass();
 }
 
 

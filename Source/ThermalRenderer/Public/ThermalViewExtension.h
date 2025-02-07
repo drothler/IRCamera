@@ -6,17 +6,17 @@
 #include "CanvasTypes.h"
 #include "ThermalCamera.h"
 #include "IRCameraComponent.h"
+#include "ThermalRendering.h"
 
 class FThermalViewExtension : public FSceneViewExtensionBase
 {
 public:
     FThermalViewExtension(const FAutoRegister& AutoRegister);
-    virtual ~FThermalViewExtension()
+    virtual ~FThermalViewExtension() override
     {
         UE_LOG(LogTemp, Log, TEXT("Thermal View Extension Destroyed"));
     }
 
-    // Override the post-processing render function
     virtual void SetupViewFamily(FSceneViewFamily& InViewFamily) override {
     }
     virtual void SetupView(FSceneViewFamily& InViewFamily, FSceneView& InView) override {
@@ -24,14 +24,13 @@ public:
     virtual void BeginRenderViewFamily(FSceneViewFamily& InViewFamily) override {
     }
 
-    // Optional: Override PreRenderViewFamily_RenderThread if needed
+    // Override Empty
     virtual void PostRenderViewFamily_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneViewFamily& InViewFamily) override {};
-    virtual void PreRenderViewFamily_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneViewFamily& InViewFamily) override;
-
-    // Implement the required pure virtual function
+    virtual void PreRenderViewFamily_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneViewFamily& InViewFamily) override {};
     virtual void PreRenderView_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneView& InView) override;
 
-    //virtual void PreRenderView_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneView& InView) override;
+    // Entry Point for Thermal Render Process
+    virtual void PrePostProcessPass_RenderThread(FRDGBuilder& GraphBuilder, const FSceneView& View, const FPostProcessingInputs& Inputs) override {};
     
     virtual bool IsActiveThisFrame(FViewport* InViewport) const override;
 

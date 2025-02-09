@@ -7,6 +7,7 @@ public class IRCamera : ModuleRules
 	public IRCamera(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+	
 		
 		PublicDependencyModuleNames.AddRange(
 			new string[]

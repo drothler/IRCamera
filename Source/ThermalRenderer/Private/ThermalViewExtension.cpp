@@ -108,7 +108,7 @@ bool FThermalViewExtension::UpdateCameraRenderTarget(FSceneView& InView) {
     return true;
 }
 
-void FThermalViewExtension::PreRenderView_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneView& InView)
+void FThermalViewExtension::PostRenderBasePass_RenderThread(FRHICommandListImmediate& RHICmdList, FSceneView& InView)
 {
     UE_LOG(LogTemp, Log, TEXT("Entering Pre Post Processing"));
 
@@ -117,15 +117,15 @@ void FThermalViewExtension::PreRenderView_RenderThread(FRHICommandListImmediate&
     FRHIRenderPassInfo RPInfo{FRHIRenderPassInfo::NoRenderTargets};
 
 
-    RHICmdList.BeginRenderPass(RPInfo, TEXT("ThermalRenderer"));
+    //RHICmdList.BeginRenderPass(RPInfo, TEXT("ThermalRenderer"));
 
-    RHICmdList.SetViewport(0, 0, 0, 1920, 1080, 1);
+    //.SetViewport(0, 0, 0, 1920, 1080, 1);
 
     SCOPED_DRAW_EVENTF(RHICmdList, ThermalRenderScene, TEXT("Thermal Render Scene"));
     
     ThermalRenderer.RenderThermalScene(InView, RHICmdList);
 
-    RHICmdList.EndRenderPass();
+    //RHICmdList.EndRenderPass();
 }
 
 

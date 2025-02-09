@@ -33,11 +33,16 @@ protected:
 		PassUniformBuffer.Bind(Initializer.ParameterMap, FThermalParams::StaticStructMetadata.GetShaderVariableName());
 	}
 
-	static bool ShouldCompilePermutation(const FMeshMaterialShaderPermutationParameters& Parameters)
+	static FString GetShaderName()
 	{
-		return IsFeatureLevelSupported(Parameters.Platform, ERHIFeatureLevel::SM5);
+		return TEXT("Simple");
 	}
 
+	static bool ShouldCompilePermutation(const FMeshMaterialShaderPermutationParameters& Parameters)
+	{
+		return true;
+		return IsFeatureLevelSupported(Parameters.Platform, ERHIFeatureLevel::SM5);
+	}
 public:
 	void GetShaderBindings(
 		const FScene* Scene,
@@ -51,6 +56,21 @@ public:
 	{
 		FMeshMaterialShader::GetShaderBindings(Scene, FeatureLevel, PrimitiveSceneProxy, MaterialRenderProxy, Material, DrawRenderState, ShaderElementData, ShaderBindings);
 	}
+
+	static bool ShouldCache(EShaderPlatform Platform)
+	{
+		return IsFeatureLevelSupported(Platform, ERHIFeatureLevel::SM5);
+	}
+
+	static void ModifyCompilationEnvironment(const FMaterialShaderPermutationParameters& Parameters, FShaderCompilerEnvironment& OutEnvironment)
+	{
+		FMeshMaterialShader::ModifyCompilationEnvironment(Parameters, OutEnvironment);
+		//OutEnvironment.SetDefine(TEXT("THERMAL_VERTEX_SHADER"), 1);
+	}
+
+
+
+	
 };
 
 class ThermalPS : public FMeshMaterialShader
@@ -66,6 +86,11 @@ public:
 	}
 
 	ThermalPS() {}
+
+	static FString GetShaderName()
+	{
+		return TEXT("Simple");
+	}
 	
 	static bool ShouldCompilePermutation(const FMeshMaterialShaderPermutationParameters& Parameters)
 	{
@@ -75,7 +100,7 @@ public:
 	static void ModifyCompilationEnvironment(const FMaterialShaderPermutationParameters& Parameters, FShaderCompilerEnvironment& OutEnvironment)
 	{
 		FMeshMaterialShader::ModifyCompilationEnvironment(Parameters, OutEnvironment);
-		OutEnvironment.SetDefine(TEXT("THERMAL_PIXEL_SHADER"), 1);
+		//OutEnvironment.SetDefine(TEXT("THERMAL_PIXEL_SHADER"), 1);
 	}
 
 	void GetShaderBindings(
@@ -89,6 +114,11 @@ public:
 		FMeshDrawSingleShaderBindings& ShaderBindings) const
 	{
 		FMeshMaterialShader::GetShaderBindings(Scene, FeatureLevel, PrimitiveSceneProxy, MaterialRenderProxy, Material, DrawRenderState, ShaderElementData, ShaderBindings);
+	}
+
+	static bool ShouldCache(EShaderPlatform Platform)
+	{
+		return IsFeatureLevelSupported(Platform, ERHIFeatureLevel::SM5);
 	}
 };
 

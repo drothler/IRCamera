@@ -1,4 +1,6 @@
 #include "ThermalShading.h"
+
+#include "MeshAttributes.h"
 #include "ThermalRendering.h"
 
 #include "MeshMaterialShader.h"
@@ -6,7 +8,7 @@
 
 IMPLEMENT_MATERIAL_SHADER_TYPE(,ThermalVS, TEXT("/Plugin/IRCamera/Private/ThermalShading.usf"), TEXT("MainVS"), SF_Vertex);
 IMPLEMENT_MATERIAL_SHADER_TYPE(,ThermalPS,TEXT("/Plugin/IRCamera/Private/ThermalShading.usf"),TEXT("MainPS"),SF_Pixel);
-IMPLEMENT_SHADERPIPELINE_TYPE_VSPS(ThermalOutputPipeline, ThermalVS, ThermalPS, true);
+IMPLEMENT_SHADERPIPELINE_TYPE_VSPS(ThermalOutputPipeline, ThermalVS, ThermalPS, false);
 IMPLEMENT_GLOBAL_SHADER_PARAMETER_STRUCT(FThermalParams, "FThermalParams");
 
 static FORCEINLINE bool UseShaderPipelines(ERHIFeatureLevel::Type InFeatureLevel)
@@ -23,6 +25,13 @@ void GetThermalPassShaders(const FMaterial& Material, FVertexFactoryType* Vertex
 	{
 		VertexShader = ShaderPipeline.GetShader<ThermalVS>();
 		PixelShader = ShaderPipeline.GetShader<ThermalPS>();
+		check(VertexShader.IsValid() && PixelShader.IsValid());
+	} else
+	{
+		ShaderPipeline = FShaderPipelineRef();
+		VertexShader = Material.GetShader<ThermalVS>(VertexFactoryType);
+		PixelShader = Material.GetShader<ThermalPS>(VertexFactoryType);
+		check(VertexShader.IsValid() && PixelShader.IsValid());
 	}
 }
 
@@ -46,8 +55,11 @@ void FThermalPassMeshProcessor::Process(const FMeshBatch& MeshBatch, uint64 Batc
 
 	TMeshProcessorShaders<ThermalVS, FMeshMaterialShader, FMeshMaterialShader, ThermalPS> Shaders;
 
-	Shaders.VertexShader = MaterialResource.GetShader<ThermalVS>(VertexFactory->GetType());
-	Shaders.PixelShader = MaterialResource.GetShader<ThermalPS>(VertexFactory->GetType());
+	FShaderPipelineRef ShaderPipeline;
+
+
+	GetThermalPassShaders(MaterialResource, VertexFactory->GetType(), FeatureLevel, Shaders.VertexShader, Shaders.PixelShader, ShaderPipeline);
+
 
 	const FMeshDrawingPolicyOverrideSettings OverrideSettings = ComputeMeshOverrideSettings(MeshBatch);
 	ERasterizerFillMode MeshFillMode = ComputeMeshFillMode(MeshBatch, MaterialResource, OverrideSettings);
@@ -80,6 +92,7 @@ void FThermalPassMeshProcessor::AddMeshBatch(const FMeshBatch& RESTRICT MeshBatc
 	const FMaterial& Material = MeshBatch.MaterialRenderProxy->GetMaterialWithFallback(FeatureLevel, FallbackMaterialRenderProxyPtr);
 	const FMaterialRenderProxy& MaterialRenderProxy = FallbackMaterialRenderProxyPtr ? *FallbackMaterialRenderProxyPtr : *MeshBatch.MaterialRenderProxy;
 
+	
 	
 	if (MeshBatch.bUseForMaterial
 		&& (Material.GetBlendMode() == BLEND_Opaque || Material.IsMasked())

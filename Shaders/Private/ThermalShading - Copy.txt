@@ -1,0 +1,20 @@
+#include "/Engine/Private/Common.ush"
+#include "/Engine/Generated/Material.ush"
+#include "/Engine/Generated/VertexFactory.ush"
+
+
+
+void MainVS(FVertexFactoryInput Input, out float2 OutUV : TEXCOORD0, out float4 OutPosition : SV_POSITION)
+{
+	FVertexFactoryIntermediates VFIntermediates = GetVertexFactoryIntermediates(Input);
+	OutPosition = VertexFactoryGetWorldPosition(Input, VFIntermediates) - float4(ResolvedView.PreViewTranslation, 0.0f);;
+	OutUV = float2(0.0f, 0.0f);
+}
+
+
+// The main pixel shader
+void MainPS(in float2 InUV : TEXCOORD0, out float4 OutColor : SV_Target0)
+{
+
+	OutColor = float4(1.0f, 0.0f, 0.0f, 1.0f);
+}

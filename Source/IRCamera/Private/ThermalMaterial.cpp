@@ -68,3 +68,4 @@ FString UMaterialExpressionThermalMaterial::GetFunctionName() const
 }
 
 #endif
+
